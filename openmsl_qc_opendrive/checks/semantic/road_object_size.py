@@ -39,7 +39,7 @@ def check_object_size(road: etree.Element, object: etree.Element, checker_data: 
         return # checked by schema
     elif objectRadiusAttrib:
         objectRadius = utils.to_float(object.attrib["radius"])
-        if objectRadius < 0.0 or objectRadius > MAX_OBJECT_RADIUS:          # TODO 3x < 0.0 check-> sollte eigentlich das Schema checken, tut es aber nicht in 1.5 (bei 2/3 in 1.7)
+        if objectRadius < 0.0 or objectRadius > MAX_OBJECT_RADIUS:          # TODO 3x < 0.0 check-> should be done by schema checks already, but is not done in 1.5 (and onyl in 2 cases in 1.7)
             issue_descriptions.append(f"object {objectID} of road {roadID} has invalid radius {objectRadius} out of range (0-{MAX_OBJECT_RADIUS})")
     else:
         objectLength = utils.to_float(object.attrib["length"])

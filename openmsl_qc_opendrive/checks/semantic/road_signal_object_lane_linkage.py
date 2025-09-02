@@ -37,7 +37,7 @@ def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHa
     if toLane != '0' and utils.get_lane_from_lane_section(laneSection, utils.to_int(toLane)) is None:
         issue_descriptions.append(f"lane validity of {signal_object.tag} {id} references to not existing toLane {toLane}")
 
-    # check if from is lower                                # TODO from immer kleiner? oder abs(from) kleiner? Was wenn orientation both?
+    # check if from is lower                                # TODO check if from is on the inner side of to. Also if orientation is both?
     #if int(fromLane) > int(toLane):
     #    message = f"lane validity of {signal_object.tag} {id} invalid. fromLane needs to be lower than or equal to toLane"
     #    checker.gen_issue(IssueLevel.WARNING, message, create_location_from_element(signal_object))

@@ -44,7 +44,7 @@
 
 ### check_openmsl_xodr_road_lane_id_order
 
-* Description: lane order should be continous and without gaps.
+* Description: lane order should be continuous and without gaps.
 
 ### check_openmsl_xodr_road_lane_link_id
 
@@ -52,7 +52,7 @@
 
 ### check_openmsl_xodr_road_lane_property_sOffset
 
-* Description: lane sOffsets (must be ascending, not too high) and sometimes be zero.
+* Description: lane sOffsets must be ascending, should not exceed the length of road and must be zero for first element of width/border.
 
 ### check_openmsl_xodr_road_lane_type_none
 
@@ -60,7 +60,7 @@
 
 ### check_openmsl_xodr_road_lane_width
 
-* Description: Lane width must always be greater than 0 or at the start/end point of a lanesection >= 0.
+* Description: Lane width must always be greater than zero or at the start/end point of a lanesection greater or equal to zero.
 
 ### check_openmsl_xodr_road_lanesection_min_length
 

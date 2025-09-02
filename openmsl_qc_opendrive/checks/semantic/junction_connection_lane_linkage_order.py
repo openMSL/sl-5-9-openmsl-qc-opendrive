@@ -12,10 +12,10 @@ from qc_baselib import IssueSeverity
 from openmsl_qc_opendrive import constants
 from openmsl_qc_opendrive.base import models, utils
 
-CHECKER_ID = "check_openmsl_xodr_junction_connection_lane_linkage_oder"
+CHECKER_ID = "check_openmsl_xodr_junction_connection_lane_linkage_order"
 CHECKER_DESCRIPTION = "Lane Links of Junction Connections should be ordered from left to right"
 CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
-RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_oder"
+RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_order"
 
 def _check_all_junctions(checker_data: models.CheckerData) -> None:
     invalid = 999
@@ -56,7 +56,7 @@ def _check_all_junctions(checker_data: models.CheckerData) -> None:
 
 def check_rule(checker_data: models.CheckerData) -> None:
     """
-    Rule ID: openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_oder
+    Rule ID: openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_order
 
     Description: Lane Links of Junction Connections should be ordered from left to right
 
@@ -67,6 +67,6 @@ def check_rule(checker_data: models.CheckerData) -> None:
     Remark:
         TODO
     """
-    logging.info("Executing road.semantic.junction_connection_lane_linkage_oder check.")
+    logging.info("Executing road.semantic.junction_connection_lane_linkage_order check.")
 
     _check_all_junctions(checker_data)

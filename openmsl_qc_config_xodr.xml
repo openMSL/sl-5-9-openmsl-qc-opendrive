@@ -10,7 +10,7 @@
         <Checker checkerId="check_openmsl_xodr_road_min_length" maxLevel="1" minLevel="3" />
         <Checker checkerId="check_openmsl_xodr_crg_reference" maxLevel="1" minLevel="3" />
         <Checker checkerId="check_openmsl_xodr_junction_connection_lane_link_id" maxLevel="1" minLevel="3" />		
-        <Checker checkerId="check_openmsl_xodr_junction_connection_lane_linkage_oder" maxLevel="1" minLevel="3" />
+        <Checker checkerId="check_openmsl_xodr_junction_connection_lane_linkage_order" maxLevel="1" minLevel="3" />
         <Checker checkerId="check_openmsl_xodr_junction_connection_road_linkage" maxLevel="1" minLevel="3" />
 		<Checker checkerId="check_openmsl_xodr_junction_driving_lanes_continue" maxLevel="1" minLevel="3" />
 		<Checker checkerId="check_openmsl_xodr_road_lane_link_id" maxLevel="1" minLevel="3" />		

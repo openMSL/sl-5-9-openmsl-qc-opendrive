@@ -110,7 +110,7 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                 for lane in lanes:
                     laneID = lane.attrib["id"]
                     laneType = lane.attrib['type']
-                    if laneType != 'driving':                                           # TODO mehr Lanetypen
+                    if laneType != 'driving':                                           # TODO accept more lanetypes
                         continue                        # only check driving lanes
 
                     for speed in lane.findall("./speed"):

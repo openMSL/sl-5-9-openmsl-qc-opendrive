@@ -13,7 +13,7 @@ from openmsl_qc_opendrive import constants
 from openmsl_qc_opendrive.base import models, utils
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_id_order"
-CHECKER_DESCRIPTION = "lane order should be continous and without gaps"
+CHECKER_DESCRIPTION = "lane order should be continuous and without gaps"
 CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_lane_id_order"
 
@@ -84,7 +84,7 @@ def check_rule(checker_data: models.CheckerData) -> None:
     """
     Rule ID: openmsl.net:xodr:1.4.0:road.semantic.road_lane_id_order
 
-    Description: lane order should be continous and without gaps
+    Description: lane order should be continuous and without gaps
 
     Severity: WARNING
 

@@ -13,7 +13,7 @@ from openmsl_qc_opendrive import constants
 from openmsl_qc_opendrive.base import models, utils
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_property_sOffset"
-CHECKER_DESCRIPTION = "lane sOffsets (must be ascending, not too high) and sometimes be zero"
+CHECKER_DESCRIPTION = "lane sOffsets must be ascending, should not exceed the length of road and must be zero for first element of width/border"
 CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_lane_property_sOffset"
 
@@ -100,7 +100,7 @@ def check_rule(checker_data: models.CheckerData) -> None:
     """
     Rule ID: openmsl.net:xodr:1.4.0:road.semantic.road_lane_property_sOffset
 
-    Description: lane sOffsets (must be ascending, not too high) and sometimes be zero.
+    Description: lane sOffsets must be ascending, should not exceed the length of road and must be zero for first element of width/border.
 
     Severity: WARNING
 

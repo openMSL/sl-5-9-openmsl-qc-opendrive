@@ -13,7 +13,7 @@ from openmsl_qc_opendrive import constants
 from openmsl_qc_opendrive.base import models, utils
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_width"
-CHECKER_DESCRIPTION = "Lane width must always be greater than 0 or at the start/end point of a lanesection >= 0"
+CHECKER_DESCRIPTION = "Lane width must always be greater than zero or at the start/end point of a lanesection greater or equal to zero"
 CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_lane_width"
 
@@ -91,7 +91,7 @@ def check_rule(checker_data: models.CheckerData) -> None:
     """
     Rule ID: openmsl.net:xodr:1.4.0:road.semantic.road_lane_width
 
-    Description: Lane width must always be greater than 0 or at the start/end point of a lanesection >= 0.
+    Description: Lane width must always be greater than zero or at the start/end point of a lanesection greater or equal to zero.
 
     Severity: WARNING
 

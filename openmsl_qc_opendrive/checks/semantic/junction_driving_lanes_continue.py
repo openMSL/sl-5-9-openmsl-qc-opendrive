@@ -53,7 +53,7 @@ def getDrivingLanesTowardsJunction(road: etree._Element, junctionID: int):
         for lane in lanes:
             laneType = lane.attrib['type']
             if (laneType == "driving" or laneType == "entry" or laneType == "exit" or laneType == "onRamp" or laneType == "offRamp" or 
-                laneType == "connectionRamp"):            # TODO weitere? .... config file
+                laneType == "connectionRamp"):            # TODO more lanetypes? .... use config file
                 drivingLanes.append(lane.attrib['id'])
     if successor is not None and successor == junctionID:
         foundLinkedRoad = True
@@ -65,7 +65,7 @@ def getDrivingLanesTowardsJunction(road: etree._Element, junctionID: int):
         for lane in lanes:
             laneType = lane.attrib['type']
             if (laneType == "driving" or laneType == "entry" or laneType == "exit" or laneType == "onRamp" or laneType == "offRamp" or 
-                laneType == "connectionRamp"):            # TODO weitere? .... config file
+                laneType == "connectionRamp"):            # TODO more lanetypes? .... use config file
                 drivingLanes.append(lane.attrib['id'])
 
     return drivingLanes, foundLinkedRoad  
