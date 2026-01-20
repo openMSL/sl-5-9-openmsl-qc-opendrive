@@ -10,7 +10,7 @@ from lxml import etree
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_signal_object_lane_linkage"
 CHECKER_DESCRIPTION = "Linked Lanes should exist and orientation should match with driving direction"
@@ -24,17 +24,17 @@ def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHa
 
     # check if lanes exist at signal/object position
     id = signal_object.attrib['id']
-    sValue = utils.to_float(signal_object.attrib['s'])
-    tValue = utils.to_float(signal_object.attrib['t'])
+    sValue = to_float(signal_object.attrib['s'])
+    tValue = to_float(signal_object.attrib['t'])
     fromLane = validity.attrib['fromLane']
     toLane = validity.attrib['toLane']
-    laneSection = utils.get_lane_section_from_road_by_s(road, sValue)
+    laneSection = get_lane_section_from_road_by_s(road, sValue)
     issue_descriptions = []
     if fromLane == '0' or toLane == '0':
         issue_descriptions.append(f"lane validity of {signal_object.tag} {id} references to invalid lane 0")
-    if fromLane != '0' and utils.get_lane_from_lane_section(laneSection, utils.to_int(fromLane)) is None:
+    if fromLane != '0' and get_lane_from_lane_section(laneSection, to_int(fromLane)) is None:
         issue_descriptions.append(f"lane validity of {signal_object.tag} {id} references to not existing fromLane {fromLane}")
-    if toLane != '0' and utils.get_lane_from_lane_section(laneSection, utils.to_int(toLane)) is None:
+    if toLane != '0' and get_lane_from_lane_section(laneSection, to_int(toLane)) is None:
         issue_descriptions.append(f"lane validity of {signal_object.tag} {id} references to not existing toLane {toLane}")
 
     # check if from is lower                                # TODO check if from is on the inner side of to. Also if orientation is both?
@@ -47,17 +47,17 @@ def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHa
     error = ""
     if traffic_rule == models.TrafficHandRule.RHT:                   # right hand traffic
         if orientation == '+':                  # negative lane ids
-            if utils.to_int(fromLane) > 0 or utils.to_int(toLane) > 0:
+            if to_int(fromLane) > 0 or to_int(toLane) > 0:
                 error = "negative"
         elif orientation == '-':                # positve lane ids
-            if utils.to_int(fromLane) < 0 or utils.to_int(toLane) < 0:
+            if to_int(fromLane) < 0 or to_int(toLane) < 0:
                 error = "positive"
     elif traffic_rule == models.TrafficHandRule.LHT:                 # left hand traffic
         if orientation == '-':                  # negative lane ids
-            if utils.to_int(fromLane) > 0 or utils.to_int(toLane) > 0:
+            if to_int(fromLane) > 0 or to_int(toLane) > 0:
                 error = "negative"
         elif orientation == '+':                # positve lane ids
-            if utils.to_int(fromLane) < 0 or utils.to_int(toLane) < 0:
+            if to_int(fromLane) < 0 or to_int(toLane) < 0:
                 error = "positive"
     if error != "":
         issue_descriptions.append(f"lane validity of {signal_object.tag} {id} should be {error} for {traffic_rule} with orientation {orientation}")
@@ -81,7 +81,7 @@ def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHa
         )
 
         # add 3d point
-        inertial_point = utils.get_point_xyz_from_road(road, sValue, tValue, 0.0)
+        inertial_point = get_point_xyz_from_road(road, sValue, tValue, 0.0)
         if inertial_point is not None:
             checker_data.result.add_inertial_location(
                 checker_bundle_name=constants.BUNDLE_NAME,
@@ -94,10 +94,10 @@ def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHa
             )        
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
-        rule = utils.get_traffic_hand_rule_from_road(road)
+        rule = get_traffic_hand_rule_from_road(road)
 
         for signal in road.findall("./signals/signal"):        
             check_validity(signal, rule, road, checker_data)

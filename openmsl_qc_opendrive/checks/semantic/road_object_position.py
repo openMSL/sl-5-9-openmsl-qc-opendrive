@@ -10,7 +10,7 @@ from lxml import etree
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_object_position"
 CHECKER_DESCRIPTION = "check if object position is valid - s value is in range of road length, t and zOffset in range"
@@ -23,12 +23,12 @@ MAX_RANGE_OBJECT_ZOFFSET = 20
 
 def check_object_postion_for_road(road: etree.Element, object: etree.Element, checker_data: models.CheckerData) -> None:
     roadID = road.attrib["id"]
-    roadLength = utils.get_road_length(road)
+    roadLength = get_road_length(road)
     objectID = object.attrib["id"]
     issue_descriptions = []
 
     # check s position
-    objectS = utils.to_float(object.attrib["s"])
+    objectS = to_float(object.attrib["s"])
     if objectS - roadLength > EPSILON_S_ON_ROAD:
         issue_descriptions.append(f"object {objectID} of road {roadID} has too high s value {objectS} (road length = {roadLength})")
         objectS = roadLength
@@ -36,19 +36,19 @@ def check_object_postion_for_road(road: etree.Element, object: etree.Element, ch
     # check t position
     objectT = 0.0
     if object.tag != "tunnel" and object.tag != "bridge":
-        objectT = utils.to_float(object.attrib["t"]) 
+        objectT = to_float(object.attrib["t"]) 
         if objectT < -MAX_RANGE_OBJECT_T or objectT > MAX_RANGE_OBJECT_T:
             issue_descriptions.append(f"object {objectID} of road {roadID} has t value {objectT} out of range (-{MAX_RANGE_OBJECT_T}, +{MAX_RANGE_OBJECT_T})")
 
     # check zOffset
     if object.tag == "object":
-        objectZOffset = utils.to_float(object.attrib["zOffset"])
+        objectZOffset = to_float(object.attrib["zOffset"])
         if objectZOffset < -MAX_RANGE_OBJECT_ZOFFSET or objectZOffset > MAX_RANGE_OBJECT_ZOFFSET:
             issue_descriptions.append(f"object {objectID} of road {roadID} has zOffset value {objectZOffset} out of range (-{MAX_RANGE_OBJECT_ZOFFSET}, +{MAX_RANGE_OBJECT_ZOFFSET})")
 
     # check length of tunnel, bridge
     if object.tag == "tunnel" or object.tag == "bridge":
-        objectLength = utils.to_float(object.attrib["length"]) 
+        objectLength = to_float(object.attrib["length"]) 
         if objectS  + objectLength - roadLength  > EPSILON_S_ON_ROAD:
             issue_descriptions.append(f"{object.tag} {objectID} of road {roadID} is too long (EndS = {objectS  + objectLength}, road length = {roadLength})")
     
@@ -71,7 +71,7 @@ def check_object_postion_for_road(road: etree.Element, object: etree.Element, ch
         )
 
         # add 3d point
-        inertial_point = utils.get_point_xyz_from_road(road, objectS, objectT, 0.0)
+        inertial_point = get_point_xyz_from_road(road, objectS, objectT, 0.0)
         if inertial_point is not None:
             checker_data.result.add_inertial_location(
                 checker_bundle_name=constants.BUNDLE_NAME,
@@ -84,7 +84,7 @@ def check_object_postion_for_road(road: etree.Element, object: etree.Element, ch
             )        
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         for object in road.findall("./objects/object"):

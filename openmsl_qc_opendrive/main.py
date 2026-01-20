@@ -22,7 +22,8 @@ from openmsl_qc_opendrive.checks import linkage
 from openmsl_qc_opendrive.checks import semantic
 from openmsl_qc_opendrive.checks import statistic
 from openmsl_qc_opendrive.checks import tool_compatibility_checks
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
+#from openmsl_qc_opendrive.base import models, utils
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
@@ -76,6 +77,33 @@ def execute_checker(
         )
 
         return
+    
+    def compare_versions(version1: str, version2: str) -> int:
+    # Compare two version strings like "X.x.x"
+    # This function is to avoid comparing version string basing on lexicographical order that could cause problem.
+    # E.g. 1.10.0 > 1.2.0 but lexicographical comparison of string would return the opposite
+    # Args:
+    #    version1 (str): First string to compare
+    #    version2 (str): Second string to compare
+    # Returns:
+    #    int: 1 if version1 is bigger than version2. 0 if the version are the same. -1 otherwise
+        v1_components = list(map(int, version1.split(".")))
+        v2_components = list(map(int, version2.split(".")))
+
+        # Compare each component until one is greater or they are equal
+        for v1, v2 in zip(v1_components, v2_components):
+            if v1 < v2:
+                return -1
+            elif v1 > v2:
+                return 1
+
+        # If all components are equal, compare based on length
+        if len(v1_components) < len(v2_components):
+            return -1
+        elif len(v1_components) > len(v2_components):
+            return 1
+        else:
+            return 0
 
     # Checker definition setting. If not satisfied then set status as SKIPPED and return
     if required_definition_setting:
@@ -88,7 +116,7 @@ def execute_checker(
         definition_setting = splitted_rule_uid[2]
         if (
             schema_version is None
-            or utils.compare_versions(schema_version, definition_setting) < 0
+            or compare_versions(schema_version, definition_setting) < 0
         ):
             checker_data.result.set_checker_status(
                 checker_bundle_name=constants.BUNDLE_NAME,
@@ -143,7 +171,7 @@ def run_checks(config: Configuration, result: Result) -> None:
     )
 
     # Get xml root if the input file is a valid xml doc
-    checker_data.input_file_xml_root = utils.get_root_without_default_namespace(checker_data.xml_file_path)
+    checker_data.input_file_xml_root = get_root_without_default_namespace(checker_data.xml_file_path)
 
     # 1. Run semantic checks
     execute_checker(semantic.junction_connection_lane_link_id, checker_data)

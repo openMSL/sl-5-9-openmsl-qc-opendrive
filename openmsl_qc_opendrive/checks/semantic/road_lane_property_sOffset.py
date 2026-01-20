@@ -10,7 +10,7 @@ from qc_baselib import IssueSeverity
 from lxml import etree
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_property_sOffset"
 CHECKER_DESCRIPTION = "lane sOffsets must be ascending, should not exceed the length of road and must be zero for first element of width/border"
@@ -22,7 +22,7 @@ LENGTH_EPSILON = 0.0000001
 def checkLanePropSOffsets(road: etree._Element, lane: etree._Element, laneSection: models.LaneSectionWithLength, lanePropertyName: str, checker_data: models.CheckerData):
     roadID = road.attrib["id"]
     laneID = int(lane.attrib["id"])
-    startOfLaneSection = utils.get_s_from_lane_section(laneSection.lane_section)
+    startOfLaneSection = get_s_from_lane_section(laneSection.lane_section)
     prevSOffset = float(-1.0)
     for laneProperty in lane.findall(lanePropertyName):
         sOffset = float(laneProperty.attrib["sOffset"])
@@ -57,7 +57,7 @@ def checkLanePropSOffsets(road: etree._Element, lane: etree._Element, laneSectio
                 description=description,
             )
             # add 3d point
-            inertial_point = utils.get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection.lane_section, lane, startOfLaneSection + sOffset)
+            inertial_point = get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection.lane_section, lane, startOfLaneSection + sOffset)
             if inertial_point is not None:
                 checker_data.result.add_inertial_location(
                     checker_bundle_name=constants.BUNDLE_NAME,
@@ -87,10 +87,10 @@ def checkLaneSOffsets(road: etree._Element, laneSection: models.LaneSectionWithL
          checkLanePropSOffsets(road, lane, laneSection, "rule", checker_data)
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
-        laneSections = utils.get_sorted_lane_sections_with_length_from_road(road)
+        laneSections = get_sorted_lane_sections_with_length_from_road(road)
         for laneSection in laneSections:
             checkLaneSOffsets(road, laneSection, "left", checker_data)
             checkLaneSOffsets(road, laneSection, "right", checker_data)

@@ -9,7 +9,7 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_min_length"
 CHECKER_DESCRIPTION = "Road Length shall be greater than epsilon"
@@ -19,11 +19,11 @@ RULE_UID = "openmsl.net:xodr:1.4.0:road.min_length"
 ROAD_MIN_LENGTH = 0.1
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
-        roadLength = utils.get_road_length(road)
+        roadLength = get_road_length(road)
 
         if roadLength < ROAD_MIN_LENGTH:
             description = f"road {roadID} is to short: {roadLength}m"

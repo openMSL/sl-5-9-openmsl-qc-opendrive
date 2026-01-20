@@ -6,46 +6,46 @@
 
 import pytest
 from lxml import etree
-from openmsl_qc_opendrive.base import utils
+from qc_opendrive.base.utils import *
 
 
 def test_get_root_without_default_namespace() -> None:
     # file containing namespace
-    root = utils.get_root_without_default_namespace("tests/data/utils/namespace.xodr")
+    root = get_root_without_default_namespace("tests/data/utils/namespace.xodr")
     assert type(root) == etree._ElementTree
     # file does not contain namespace
-    root = utils.get_root_without_default_namespace(
+    root = get_root_without_default_namespace(
         "tests/data/utils/Ex_Bidirectional_Junction.xodr"
     )
     assert type(root) == etree._ElementTree
 
 
 def test_get_road_id_map() -> None:
-    root = utils.get_root_without_default_namespace(
+    root = get_root_without_default_namespace(
         "tests/data/utils/Ex_Bidirectional_Junction.xodr"
     )
-    road_id_map = utils.get_road_id_map(root)
+    road_id_map = get_road_id_map(root)
     assert len(road_id_map) == 6
 
 
 def test_get_junction_id_map() -> None:
-    root = utils.get_root_without_default_namespace(
+    root = get_root_without_default_namespace(
         "tests/data/utils/Ex_Bidirectional_Junction.xodr"
     )
-    junction_id_map = utils.get_junction_id_map(root)
+    junction_id_map = get_junction_id_map(root)
     assert len(junction_id_map) == 1
 
 
 def test_get_point_xyz_from_road_invalid_s() -> None:
-    root = utils.get_root_without_default_namespace("tests/data/utils/simple_line.xodr")
+    root = get_root_without_default_namespace("tests/data/utils/simple_line.xodr")
 
-    road = utils.get_roads(root)[0]
+    road = get_roads(root)[0]
 
-    point = utils.get_point_xyz_from_road(road, -0.001, -10, -20)
+    point = get_point_xyz_from_road(road, -0.001, -10, -20)
 
     assert point is None
 
-    point = utils.get_point_xyz_from_road(road, 100.001, -10, -20)
+    point = get_point_xyz_from_road(road, 100.001, -10, -20)
 
     assert point is None
 
@@ -309,10 +309,10 @@ def test_get_point_xyz_from_road_invalid_s() -> None:
     ],
 )
 def test_get_point_xyz_from_road(file_name, s, t, h, x, y, z) -> None:
-    root = utils.get_root_without_default_namespace(f"tests/data/utils/{file_name}")
+    root = get_root_without_default_namespace(f"tests/data/utils/{file_name}")
 
-    road = utils.get_roads(root)[0]
-    point = utils.get_point_xyz_from_road(road, s, t, h)
+    road = get_roads(root)[0]
+    point = get_point_xyz_from_road(road, s, t, h)
 
     assert point.x == pytest.approx(x, abs=1e-6)
     assert point.y == pytest.approx(y, abs=1e-6)

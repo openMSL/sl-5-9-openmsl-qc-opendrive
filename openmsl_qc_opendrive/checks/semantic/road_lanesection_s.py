@@ -9,7 +9,7 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lanesection_s"
 CHECKER_DESCRIPTION = "Check starting sOffset of lanesections"
@@ -17,15 +17,15 @@ CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.lanesection_s"
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
-        roadLength = utils.get_road_length(road)
-        laneSections = utils.get_lane_sections(road)
+        roadLength = get_road_length(road)
+        laneSections = get_lane_sections(road)
         prevLaneSectionStart = -1.0
         for laneSection in laneSections:
-            s_coordinate = utils.get_s_from_lane_section(laneSection)
+            s_coordinate = get_s_from_lane_section(laneSection)
             description = ""
             if s_coordinate > roadLength:
                 description = f"road {roadID} has laneSection with invalid (too high) s={s_coordinate} (roadLength={roadLength})"

@@ -10,7 +10,7 @@ from lxml import etree
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_junction_connection_road_linkage"
 CHECKER_DESCRIPTION = "Connection Roads need Predecessor and Successor. Connection Roads should be registered in Connection"
@@ -36,16 +36,16 @@ def registerIssue(checker_data: models.CheckerData, description : str, treeEleme
     )
 
 def _check_all_junctions(checker_data: models.CheckerData) -> None:
-    roads = utils.get_road_id_map(checker_data.input_file_xml_root)
-    junctions = utils.get_junctions(checker_data.input_file_xml_root)
+    roads = get_road_id_map(checker_data.input_file_xml_root)
+    junctions = get_junctions(checker_data.input_file_xml_root)
 
     for junction in junctions:
         junctionID = junction.attrib["id"]
-        connections = utils.get_connections_from_junction(junction)
+        connections = get_connections_from_junction(junction)
 
         connectionRoads = []
         for connection in connections:
-            connectingRoadId = utils.get_connecting_road_id_from_connection(connection)
+            connectingRoadId = get_connecting_road_id_from_connection(connection)
             if connectingRoadId is None:                    # direct junctions have no connection roads
                 continue                                        
 
@@ -56,24 +56,24 @@ def _check_all_junctions(checker_data: models.CheckerData) -> None:
             if connectingRoad is None:
                 continue                            # checked by schema
 
-            predecessorId = utils.get_predecessor_road_id(connectingRoad)
+            predecessorId = get_predecessor_road_id(connectingRoad)
             predecessor = roads.get(predecessorId)
-            successorId = utils.get_successor_road_id(connectingRoad)
+            successorId = get_successor_road_id(connectingRoad)
             successor = roads.get(successorId)
             if predecessor is None or successor is None:
                 registerIssue(checker_data, f"connectingRoad {connectingRoadId} of junction {junctionID} has no predecessor or successor!", connection)
 
         searchString = "./road[@junction='" + junctionID + "']"
         for road in checker_data.input_file_xml_root.findall(searchString):
-            roadID = utils.to_int(road.attrib['id'])
+            roadID = to_int(road.attrib['id'])
             if roadID not in connectionRoads:
                 # check if road has driving lanes - if not it does not need a connection entry
                 foundDrivingLane = False
-                laneSection_list = utils.get_lane_sections(road)
+                laneSection_list = get_lane_sections(road)
                 for laneSection in laneSection_list:
-                    lane_list = utils.get_left_and_right_lanes_from_lane_section(laneSection)
+                    lane_list = get_left_and_right_lanes_from_lane_section(laneSection)
                     for lane in lane_list:
-                        laneType = utils.get_type_from_lane(lane)
+                        laneType = get_type_from_lane(lane)
                         if laneType == "driving":
                             foundDrivingLane = True
 

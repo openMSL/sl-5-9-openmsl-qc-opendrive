@@ -10,7 +10,7 @@ from lxml import etree
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_signal_position"
 CHECKER_DESCRIPTION = "check if signal position is valid - s value is in range of road length, t and zOffset in range"
@@ -25,12 +25,12 @@ MAX_RANGE_SIGNAL_ZOFFSET = 20
 def check_signal_postion_for_road(road: etree.Element, signal: etree.Element, checker_data: models.CheckerData):
     roadID = road.attrib["id"]
     signalID = signal.attrib["id"]
-    signalS = utils.to_float(signal.attrib["s"])   
-    signalT = utils.to_float(signal.attrib["t"])     
+    signalS = to_float(signal.attrib["s"])   
+    signalT = to_float(signal.attrib["t"])     
 
     # check s position
     issue_descriptions = []
-    roadLength = utils.get_road_length(road)
+    roadLength = get_road_length(road)
     if signalS - roadLength > EPSILON_S_ON_ROAD:
         issue_descriptions.append(f"signal {signalID} of road {roadID} has too high s value {signalS} (road length = {roadLength})")
         signalS = roadLength        
@@ -41,7 +41,7 @@ def check_signal_postion_for_road(road: etree.Element, signal: etree.Element, ch
 
     # check z position
     if signal.tag != "signalReference":
-        signalZOffset = utils.to_float(signal.attrib["zOffset"])
+        signalZOffset = to_float(signal.attrib["zOffset"])
         if signalZOffset < -MAX_RANGE_SIGNAL_ZOFFSET or signalZOffset > MAX_RANGE_SIGNAL_ZOFFSET:
             issue_descriptions.append(f"signal {signalID} of road {roadID} has zOffset value {signalZOffset} out of range (-{MAX_RANGE_SIGNAL_ZOFFSET}, +{MAX_RANGE_SIGNAL_ZOFFSET})")
 
@@ -64,7 +64,7 @@ def check_signal_postion_for_road(road: etree.Element, signal: etree.Element, ch
         )
 
         # add 3d point
-        inertial_point = utils.get_point_xyz_from_road(road, signalS, signalT, 0.0)
+        inertial_point = get_point_xyz_from_road(road, signalS, signalT, 0.0)
         if inertial_point is not None:
             checker_data.result.add_inertial_location(
                 checker_bundle_name=constants.BUNDLE_NAME,
@@ -77,7 +77,7 @@ def check_signal_postion_for_road(road: etree.Element, signal: etree.Element, ch
             )        
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         for signal in road.findall("./signals/signal"):

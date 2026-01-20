@@ -11,7 +11,7 @@ from qc_baselib import IssueSeverity
 from pathlib import Path
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_crg_reference"
 CHECKER_DESCRIPTION = "check reference to OpenCRG files"

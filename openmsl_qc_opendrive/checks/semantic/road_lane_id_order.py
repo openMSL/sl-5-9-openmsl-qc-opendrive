@@ -10,7 +10,7 @@ from qc_baselib import IssueSeverity
 from lxml import etree
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_id_order"
 CHECKER_DESCRIPTION = "lane order should be continuous and without gaps"
@@ -21,14 +21,14 @@ RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_lane_id_order"
 def check_LaneID_Order(road: etree._ElementTree, laneSection: etree._ElementTree, side: str, checker_data: models.CheckerData) -> None:
     # get lanes and starting lane id
     if side == "left": 
-        lanes = utils.get_left_lanes_from_lane_section(laneSection)
+        lanes = get_left_lanes_from_lane_section(laneSection)
         startLaneID = len(lanes)
     elif side == "right":
-        lanes = utils.get_right_lanes_from_lane_section(laneSection)
+        lanes = get_right_lanes_from_lane_section(laneSection)
         startLaneID = -1
 
     # check lane ids
-    s_coordinate = utils.get_s_from_lane_section(laneSection)
+    s_coordinate = get_s_from_lane_section(laneSection)
     roadID = road.attrib["id"]       
     issue_descriptions = []
     for lane in lanes:
@@ -59,7 +59,7 @@ def check_LaneID_Order(road: etree._ElementTree, laneSection: etree._ElementTree
             continue
 
         # add 3d point
-        inertial_point = utils.get_point_xyz_from_road_reference_line(road, s_coordinate)
+        inertial_point = get_point_xyz_from_road_reference_line(road, s_coordinate)
         if inertial_point is not None:
             checker_data.result.add_inertial_location(
                 checker_bundle_name=constants.BUNDLE_NAME,
@@ -72,10 +72,10 @@ def check_LaneID_Order(road: etree._ElementTree, laneSection: etree._ElementTree
             )        
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
-        laneSections = utils.get_lane_sections(road)
+        laneSections = get_lane_sections(road)
         for laneSection in laneSections:
             check_LaneID_Order(road, laneSection, "left", checker_data)
             check_LaneID_Order(road, laneSection, "right", checker_data)
