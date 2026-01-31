@@ -7,7 +7,7 @@ from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_statistic"
 CHECKER_DESCRIPTION = "Prints some infos about OpenDrive file"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:statistic"
 
 def calc_frequency(checker_data: models.CheckerData) -> None:

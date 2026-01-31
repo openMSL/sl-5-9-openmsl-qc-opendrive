@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -15,7 +15,7 @@ from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_type_vs_speed_limit"
 CHECKER_DESCRIPTION = "Speed Limit of Lanes should match with road type"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.road_type_vs_speed_limit"
 
 def getSpeedRange(roadType: str) -> None:

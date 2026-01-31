@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -13,7 +13,7 @@ from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_type_none"
 CHECKER_DESCRIPTION = "Lane Type shall not be None"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.lane_type.none"
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:

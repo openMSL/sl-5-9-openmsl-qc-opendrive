@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -14,7 +14,7 @@ from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_signal_object_lane_linkage"
 CHECKER_DESCRIPTION = "Linked Lanes should exist and orientation should match with driving direction"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.signal_object_lane_linkage"
 
 def check_validity(signal_object: etree._Element, traffic_rule: models.TrafficHandRule, road: etree._Element, checker_data: models.CheckerData) -> None:

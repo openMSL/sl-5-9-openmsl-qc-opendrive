@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -23,7 +23,6 @@ from openmsl_qc_opendrive.checks import semantic
 from openmsl_qc_opendrive.checks import statistic
 from openmsl_qc_opendrive.checks import tool_compatibility_checks
 from qc_opendrive.base.utils import *
-#from openmsl_qc_opendrive.base import models, utils
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
