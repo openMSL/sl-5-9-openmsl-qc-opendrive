@@ -3,8 +3,8 @@
 
     <Param name="InputFile" value="test.xodr" />
 
-    <CheckerBundle application="xodrBundle">
-        <Param name="resultFile" value="xodr_bundle_report.xqar" />
+    <CheckerBundle application="openmsl_xodrBundle">
+        <Param name="resultFile" value="openmsl_xodr_bundle_report.xqar" />
         <Checker checkerId="check_openmsl_xodr_road_geometry_length" maxLevel="1" minLevel="3" />
         <Checker checkerId="check_openmsl_xodr_road_geometry_parampoly3_attributes" maxLevel="1" minLevel="3" />
         <Checker checkerId="check_openmsl_xodr_road_min_length" maxLevel="1" minLevel="3" />

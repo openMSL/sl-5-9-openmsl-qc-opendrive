@@ -7,22 +7,22 @@
 import argparse
 import logging
 import types
-import sys
-#import os
 
-import sys
-print(sys.path)
+import openmsl_qc_opendrive
+print(openmsl_qc_opendrive.__file__)
 
 from qc_baselib import Configuration, Result, StatusType
-from qc_baselib.models.common import ParamType
+from qc_baselib.models.result import RuleType
+#from qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 from openmsl_qc_opendrive import constants
+from openmsl_qc_opendrive import version
 from openmsl_qc_opendrive.checks import geometry
 from openmsl_qc_opendrive.checks import linkage
 from openmsl_qc_opendrive.checks import semantic
 from openmsl_qc_opendrive.checks import statistic
 from openmsl_qc_opendrive.checks import tool_compatibility_checks
-from qc_opendrive.base.utils import *
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
@@ -40,10 +40,117 @@ def args_entrypoint() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def check_preconditions(
+    checker: types.ModuleType, checker_data: models.CheckerData
+) -> bool:
+    """
+    Check preconditions. If not satisfied then set status as SKIPPED and return False
+    """
+    if checker_data.result.all_checkers_completed_without_issue(
+        checker.CHECKER_PRECONDITIONS
+    ):
+        return True
+    else:
+        checker_data.result.set_checker_status(
+            checker_bundle_name=constants.BUNDLE_NAME,
+            checker_id=checker.CHECKER_ID,
+            status=StatusType.SKIPPED,
+        )
+
+        checker_data.result.add_checker_summary(
+            constants.BUNDLE_NAME,
+            checker.CHECKER_ID,
+            "Preconditions are not satisfied. Skip the check.",
+        )
+
+        return False
+
+
+def check_version(checker: types.ModuleType, checker_data: models.CheckerData) -> bool:
+    """
+    Check definition setting and applicable version.
+    If not satisfied then set status as SKIPPED or ERROR and return False
+    """
+    schema_version = checker_data.schema_version
+
+    rule_uid = RuleType(rule_uid=checker.RULE_UID)
+    definition_setting_expr = f">={rule_uid.definition_setting}"
+    match_definition_setting = version.match(schema_version, definition_setting_expr)
+
+    applicable_version = getattr(checker, "APPLICABLE_VERSION", "")
+
+    # Check whether applicable version specification is valid
+    if not version.is_valid_version_expression(applicable_version):
+        checker_data.result.set_checker_status(
+            checker_bundle_name=constants.BUNDLE_NAME,
+            checker_id=checker.CHECKER_ID,
+            status=StatusType.ERROR,
+        )
+
+        checker_data.result.add_checker_summary(
+            constants.BUNDLE_NAME,
+            checker.CHECKER_ID,
+            f"The applicable version {applicable_version} is not valid. Skip the check.",
+        )
+
+        return False
+
+    # Check whether definition setting specification is valid
+    if not version.is_valid_version_expression(definition_setting_expr):
+        checker_data.result.set_checker_status(
+            checker_bundle_name=constants.BUNDLE_NAME,
+            checker_id=checker.CHECKER_ID,
+            status=StatusType.ERROR,
+        )
+
+        checker_data.result.add_checker_summary(
+            constants.BUNDLE_NAME,
+            checker.CHECKER_ID,
+            f"The definition setting {rule_uid.definition_setting} is not valid. Skip the check.",
+        )
+
+        return False
+
+    # First, check applicable version
+    if not version.match(schema_version, applicable_version):
+        checker_data.result.set_checker_status(
+            checker_bundle_name=constants.BUNDLE_NAME,
+            checker_id=checker.CHECKER_ID,
+            status=StatusType.SKIPPED,
+        )
+
+        checker_data.result.add_checker_summary(
+            constants.BUNDLE_NAME,
+            checker.CHECKER_ID,
+            f"Version {schema_version} is not valid according to the applicable version {applicable_version}. Skip the check.",
+        )
+
+        return False
+
+    # Check definition setting if there is no applicable version or applicable version has no lower bound
+    if not version.has_lower_bound(applicable_version):
+        if not match_definition_setting:
+            checker_data.result.set_checker_status(
+                checker_bundle_name=constants.BUNDLE_NAME,
+                checker_id=checker.CHECKER_ID,
+                status=StatusType.SKIPPED,
+            )
+
+            checker_data.result.add_checker_summary(
+                constants.BUNDLE_NAME,
+                checker.CHECKER_ID,
+                f"Version {schema_version} is not valid according to definition setting {definition_setting_expr}. Skip the check.",
+            )
+
+            return False
+
+    return True
+
+
 def execute_checker(
     checker: types.ModuleType,
     checker_data: models.CheckerData,
-    required_definition_setting: bool = False,
+    version_required: bool = True,
 ) -> None:
     # Register checker
     checker_data.result.register_checker(
@@ -60,75 +167,14 @@ def execute_checker(
     )
 
     # Check preconditions. If not satisfied then set status as SKIPPED and return
-    if not checker_data.result.all_checkers_completed_without_issue(
-        checker.CHECKER_PRECONDITIONS
-    ):
-        checker_data.result.set_checker_status(
-            checker_bundle_name=constants.BUNDLE_NAME,
-            checker_id=checker.CHECKER_ID,
-            status=StatusType.SKIPPED,
-        )
-
-        checker_data.result.add_checker_summary(
-            constants.BUNDLE_NAME,
-            checker.CHECKER_ID,
-            "Preconditions are not satisfied. Skip the check.",
-        )
-
+    satisfied_preconditions = check_preconditions(checker, checker_data)
+    if not satisfied_preconditions:
         return
-    
-    def compare_versions(version1: str, version2: str) -> int:
-    # Compare two version strings like "X.x.x"
-    # This function is to avoid comparing version string basing on lexicographical order that could cause problem.
-    # E.g. 1.10.0 > 1.2.0 but lexicographical comparison of string would return the opposite
-    # Args:
-    #    version1 (str): First string to compare
-    #    version2 (str): Second string to compare
-    # Returns:
-    #    int: 1 if version1 is bigger than version2. 0 if the version are the same. -1 otherwise
-        v1_components = list(map(int, version1.split(".")))
-        v2_components = list(map(int, version2.split(".")))
 
-        # Compare each component until one is greater or they are equal
-        for v1, v2 in zip(v1_components, v2_components):
-            if v1 < v2:
-                return -1
-            elif v1 > v2:
-                return 1
-
-        # If all components are equal, compare based on length
-        if len(v1_components) < len(v2_components):
-            return -1
-        elif len(v1_components) > len(v2_components):
-            return 1
-        else:
-            return 0
-
-    # Checker definition setting. If not satisfied then set status as SKIPPED and return
-    if required_definition_setting:
-        schema_version = checker_data.schema_version
-
-        splitted_rule_uid = checker.RULE_UID.split(":")
-        if len(splitted_rule_uid) != 4:
-            raise RuntimeError(f"Invalid rule uid: {checker.RULE_UID}")
-
-        definition_setting = splitted_rule_uid[2]
-        if (
-            schema_version is None
-            or compare_versions(schema_version, definition_setting) < 0
-        ):
-            checker_data.result.set_checker_status(
-                checker_bundle_name=constants.BUNDLE_NAME,
-                checker_id=checker.CHECKER_ID,
-                status=StatusType.SKIPPED,
-            )
-
-            checker_data.result.add_checker_summary(
-                constants.BUNDLE_NAME,
-                checker.CHECKER_ID,
-                f"Version {schema_version} is lower than definition setting {definition_setting}. Skip the check.",
-            )
-
+    # Check definition setting and applicable version
+    if version_required:
+        satisfied_version = check_version(checker, checker_data)
+        if not satisfied_version:
             return
 
     # Execute checker
@@ -171,6 +217,8 @@ def run_checks(config: Configuration, result: Result) -> None:
 
     # Get xml root if the input file is a valid xml doc
     checker_data.input_file_xml_root = get_root_without_default_namespace(checker_data.xml_file_path)
+
+    checker_data.schema_version = get_standard_schema_version(checker_data.input_file_xml_root)
 
     # 1. Run semantic checks
     execute_checker(semantic.junction_connection_lane_link_id, checker_data)
