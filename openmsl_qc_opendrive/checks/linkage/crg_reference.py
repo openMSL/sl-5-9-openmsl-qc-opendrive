@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -11,11 +11,11 @@ from qc_baselib import IssueSeverity
 from pathlib import Path
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_crg_reference"
 CHECKER_DESCRIPTION = "check reference to OpenCRG files"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.linkage.crg_reference"
 
 def _check_references(checker_data: models.CheckerData) -> None:

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,26 +9,26 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lane_type_none"
 CHECKER_DESCRIPTION = "Lane Type shall not be None"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.lane_type.none"
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
 
-        laneSection_list = utils.get_lane_sections(road)
+        laneSection_list = get_lane_sections(road)
         for laneSection in laneSection_list:
-            s_coordinate = utils.get_s_from_lane_section(laneSection)
+            s_coordinate = get_s_from_lane_section(laneSection)
 
-            lane_list = utils.get_left_and_right_lanes_from_lane_section(laneSection)
+            lane_list = get_left_and_right_lanes_from_lane_section(laneSection)
             for lane in lane_list:
-                laneType = utils.get_type_from_lane(lane)
+                laneType = get_type_from_lane(lane)
                 if laneType != "none":
                     continue               
 
@@ -55,7 +55,7 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                     continue
 
                 # add 3d point
-                inertial_point = utils.get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection, lane, s_coordinate)
+                inertial_point = get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection, lane, s_coordinate)
                 if inertial_point is not None:
                     checker_data.result.add_inertial_location(
                         checker_bundle_name=constants.BUNDLE_NAME,

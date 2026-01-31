@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,34 +9,34 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_geometry_parampoly3_attributes"
 CHECKER_DESCRIPTION = "ParamPoly3 parameters @aU, @aV and @bV shall be zero, @bU shall be > 0"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.geometry.parampoly3.attributes"
 
 TOLERANCE_THRESHOLD_BV = 0.001
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
 
-        geometry_list = utils.get_road_plan_view_geometry_list(road)
+        geometry_list = get_road_plan_view_geometry_list(road)
         for geometry in geometry_list:
-            length = utils.get_length_from_geometry(geometry)
+            length = get_length_from_geometry(geometry)
             if length is None:
                 continue
 
-            param_poly3 = utils.get_arclen_param_poly3_from_geometry(geometry)
+            param_poly3 = get_arclen_param_poly3_from_geometry(geometry)
             if param_poly3 is None:
-                param_poly3 = utils.get_normalized_param_poly3_from_geometry(geometry)
+                param_poly3 = get_normalized_param_poly3_from_geometry(geometry)
                 if param_poly3 is None:
                     continue
 
-            s_coordinate = utils.get_s_from_geometry(geometry)
+            s_coordinate = get_s_from_geometry(geometry)
 
             issue_descriptions = []
             if param_poly3.u.a != 0.0:                
@@ -75,7 +75,7 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                 s_coordinate += length / 2.0
 
                 # add 3d point
-                inertial_point = utils.get_point_xyz_from_road_reference_line(road, s_coordinate)
+                inertial_point = get_point_xyz_from_road_reference_line(road, s_coordinate)
                 if inertial_point is not None:
                     checker_data.result.add_inertial_location(
                         checker_bundle_name=constants.BUNDLE_NAME,

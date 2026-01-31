@@ -1,34 +1,28 @@
-# SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
-# This Source Code Form is subject to the terms of the Mozilla
-# Public License, v. 2.0. If a copy of the MPL was not distributed
-# with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
-
 import logging
 
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_statistic"
 CHECKER_DESCRIPTION = "Prints some infos about OpenDrive file"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:statistic"
 
 def calc_frequency(checker_data: models.CheckerData) -> None:
     issue_descriptions = []
 
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
     issue_descriptions.append(f"Number of roads: {len(roads)}")
 
-    junctions = utils.get_junctions(checker_data.input_file_xml_root)
+    junctions = get_junctions(checker_data.input_file_xml_root)
     issue_descriptions.append(f"Number of junctions: {len(junctions)}")
 
     # network length
     roadLengths = 0.0
     for road in roads:
-        roadLengths += utils.get_road_length(road)
+        roadLengths += get_road_length(road)
         float(road.attrib["length"])
     issue_descriptions.append(f"RoadNetwork length: {roadLengths} m")    
     

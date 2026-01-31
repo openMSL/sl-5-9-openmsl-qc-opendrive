@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,24 +9,24 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_lanesection_min_length"
 CHECKER_DESCRIPTION = "Length of lanesections shall be greater than epsilon"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_lanesection_min_length"
 
 LANESECTION_MIN_LENGTH = 0.02
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
-        laneSections = utils.get_sorted_lane_sections_with_length_from_road(road)
+        laneSections = get_sorted_lane_sections_with_length_from_road(road)
         for laneSection in laneSections:
             if laneSection.length < LANESECTION_MIN_LENGTH and laneSection.length >= 0.0:
-                s_coordinate = utils.get_s_from_lane_section(laneSection.lane_section)
+                s_coordinate = get_s_from_lane_section(laneSection.lane_section)
                 description = f"road {roadID} has too short laneSection s={s_coordinate} (lengths: {laneSection.length})"
 
                 # register issues
@@ -46,7 +46,7 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                     description=description,
                 )
                 # add 3d point
-                inertial_point = utils.get_point_xyz_from_road_reference_line(road, s_coordinate)
+                inertial_point = get_point_xyz_from_road_reference_line(road, s_coordinate)
                 if inertial_point is not None:
                     checker_data.result.add_inertial_location(
                         checker_bundle_name=constants.BUNDLE_NAME,

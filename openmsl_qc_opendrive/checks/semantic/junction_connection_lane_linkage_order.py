@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -10,26 +10,26 @@ from enum import Enum
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
-CHECKER_ID = "check_openmsl_xodr_junction_connection_lane_linkage_oder"
+CHECKER_ID = "check_openmsl_xodr_junction_connection_lane_linkage_order"
 CHECKER_DESCRIPTION = "Lane Links of Junction Connections should be ordered from left to right"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
-RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_oder"
+CHECKER_PRECONDITIONS = set()
+RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_order"
 
 def _check_all_junctions(checker_data: models.CheckerData) -> None:
     invalid = 999
-    junctions = utils.get_junctions(checker_data.input_file_xml_root)
+    junctions = get_junctions(checker_data.input_file_xml_root)
     for junction in junctions:
         junctionID = junction.attrib["id"]
-        connections = utils.get_connections_from_junction(junction)
+        connections = get_connections_from_junction(junction)
         for connection in connections:
             lastFrom = invalid
             connectionID = connection.attrib["id"]
-            laneLinks = utils.get_lane_links_from_connection(connection)
+            laneLinks = get_lane_links_from_connection(connection)
             issue_descriptions = []
             for laneLink in laneLinks:
-                laneFrom = utils.get_from_attribute_from_lane_link(laneLink)
+                laneFrom = get_from_attribute_from_lane_link(laneLink)
                 if lastFrom != invalid and laneFrom >= lastFrom:
                     issue_descriptions.append(f"junction {junctionID} Connection {connectionID} has invalid lane order for laneFrom: {laneFrom}")
                     break
@@ -56,7 +56,7 @@ def _check_all_junctions(checker_data: models.CheckerData) -> None:
 
 def check_rule(checker_data: models.CheckerData) -> None:
     """
-    Rule ID: openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_oder
+    Rule ID: openmsl.net:xodr:1.4.0:road.semantic.junction_connection_lane_linkage_order
 
     Description: Lane Links of Junction Connections should be ordered from left to right
 
@@ -67,6 +67,6 @@ def check_rule(checker_data: models.CheckerData) -> None:
     Remark:
         TODO
     """
-    logging.info("Executing road.semantic.junction_connection_lane_linkage_oder check.")
+    logging.info("Executing road.semantic.junction_connection_lane_linkage_order check.")
 
     _check_all_junctions(checker_data)

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,32 +9,32 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_geometry_length"
 CHECKER_DESCRIPTION = "Length of geometry elements shall be greater than epsilon and need to match with start of next element"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.geometry.length"
 
 ROAD_GEOMETRY_MIN_LENGTH = 0.01
 EPSILON_LENGTH = 0.01
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         roadID = road.attrib["id"]
-        roadLength = utils.get_road_length(road)
-        geometryList = utils.get_road_plan_view_geometry_list(road)
+        roadLength = get_road_length(road)
+        geometryList = get_road_plan_view_geometry_list(road)
 
         for geometry in geometryList:
-            sGeom = utils.get_s_from_geometry(geometry)
-            lengthGeom = utils.get_length_from_geometry(geometry)
+            sGeom = get_s_from_geometry(geometry)
+            lengthGeom = get_length_from_geometry(geometry)
 
             endLength = roadLength
             nextGeometry = geometry.getnext()
             if nextGeometry != None:
-                endLength = utils.get_s_from_geometry(nextGeometry)
+                endLength = get_s_from_geometry(nextGeometry)
 
             issue_descriptions = []
             diff = endLength - sGeom - lengthGeom
@@ -62,7 +62,7 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                 )
 
                 # add 3d point
-                inertial_point = utils.get_point_xyz_from_road_reference_line(road, sGeom)
+                inertial_point = get_point_xyz_from_road_reference_line(road, sGeom)
                 if inertial_point is not None:
                     checker_data.result.add_inertial_location(
                         checker_bundle_name=constants.BUNDLE_NAME,

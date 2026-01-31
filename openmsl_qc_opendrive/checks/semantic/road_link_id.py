@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,38 +9,38 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_link_id"
 CHECKER_DESCRIPTION = "checks if linked Predecessor/Successor road/junction exist"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_link_id"
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_road_id_map(checker_data.input_file_xml_root)
-    junctions = utils.get_junction_id_map(checker_data.input_file_xml_root)
+    roads = get_road_id_map(checker_data.input_file_xml_root)
+    junctions = get_junction_id_map(checker_data.input_file_xml_root)
 
     for roadID, road in roads.items():
         issue_descriptions = []
-        predRoad = utils.get_road_linkage(road, models.LinkageTag.PREDECESSOR)
+        predRoad = get_road_linkage(road, models.LinkageTag.PREDECESSOR)
         if predRoad:
             linked_road = roads.get(predRoad.id)
             if linked_road is None:
                 issue_descriptions.append(f"predecessor road (id={predRoad.id}) of road {roadID} not found!")
 
-        succRoad = utils.get_road_linkage(road, models.LinkageTag.SUCCESSOR)
+        succRoad = get_road_linkage(road, models.LinkageTag.SUCCESSOR)
         if succRoad:
             linked_road = roads.get(succRoad.id)
             if linked_road is None:
                 issue_descriptions.append(f"successor road (id={succRoad.id}) of road {roadID} not found!")
 
-        predJunction = utils.get_linked_junction_id(road, models.LinkageTag.PREDECESSOR)
+        predJunction = get_linked_junction_id(road, models.LinkageTag.PREDECESSOR)
         if predJunction:
             linked_junction = junctions.get(predJunction)
             if linked_junction is None:
                 issue_descriptions.append(f"predecessor junction (id={predJunction}) of road {roadID} not found!")
 
-        succJunction = utils.get_linked_junction_id(road, models.LinkageTag.SUCCESSOR)
+        succJunction = get_linked_junction_id(road, models.LinkageTag.SUCCESSOR)
         if succJunction:
             linked_junction = junctions.get(succJunction)
             if linked_junction is None:

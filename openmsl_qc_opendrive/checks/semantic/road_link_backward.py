@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -9,21 +9,21 @@ import logging
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_link_backward"
 CHECKER_DESCRIPTION = "check if linked elements are also linked to original element"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.semantic.road_link_backward"
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_road_id_map(checker_data.input_file_xml_root)
+    roads = get_road_id_map(checker_data.input_file_xml_root)
 
     for roadID, road in roads.items():
-        junctionId = utils.get_road_junction_id(road)
+        junctionId = get_road_junction_id(road)
         issue_descriptions = []
         
-        predRoad = utils.get_road_linkage(road, models.LinkageTag.PREDECESSOR)
+        predRoad = get_road_linkage(road, models.LinkageTag.PREDECESSOR)
         if predRoad:
             linked_road = roads.get(predRoad.id)
             if linked_road is not None:
@@ -31,14 +31,14 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                 if predRoad.contact_point == models.ContactPoint.END:
                     linkageTag = models.LinkageTag.SUCCESSOR
                 if junctionId != -1:
-                    backLink = utils.get_linked_junction_id(linked_road, linkageTag)
+                    backLink = get_linked_junction_id(linked_road, linkageTag)
                 else:
-                    backLink = utils.get_road_linkage(linked_road, linkageTag)
+                    backLink = get_road_linkage(linked_road, linkageTag)
 
                 if backLink is None or (junctionId != -1 and junctionId != backLink) or (junctionId == -1 and roadID != backLink.id):
                     issue_descriptions.append(f"predecessor of road {roadID} is linked to {predRoad.contact_point} of road {predRoad.id}, but reverse link does not exist!")
 
-        succRoad = utils.get_road_linkage(road, models.LinkageTag.SUCCESSOR)
+        succRoad = get_road_linkage(road, models.LinkageTag.SUCCESSOR)
         if succRoad:
             linked_road = roads.get(succRoad.id)
             if linked_road is not None:
@@ -46,9 +46,9 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
                 if succRoad.contact_point == models.ContactPoint.END:
                     linkageTag = models.LinkageTag.SUCCESSOR
                 if junctionId != -1:
-                    backLink = utils.get_linked_junction_id(linked_road, linkageTag)
+                    backLink = get_linked_junction_id(linked_road, linkageTag)
                 else:
-                    backLink = utils.get_road_linkage(linked_road, linkageTag)
+                    backLink = get_road_linkage(linked_road, linkageTag)
 
                 if backLink is None or (junctionId != -1 and junctionId != backLink) or (junctionId == -1 and roadID != backLink.id):
                     issue_descriptions.append(f"successor of road {roadID} is linked to {succRoad.contact_point} of road {succRoad.id}, but reverse link does not exist!")  

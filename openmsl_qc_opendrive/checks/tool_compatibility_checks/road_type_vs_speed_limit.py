@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Copyright 2024, Envited OpenMSL
+# Copyright 2026, Envited OpenMSL
 # This Source Code Form is subject to the terms of the Mozilla
 # Public License, v. 2.0. If a copy of the MPL was not distributed
 # with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -11,11 +11,11 @@ from lxml import etree
 from qc_baselib import IssueSeverity
 
 from openmsl_qc_opendrive import constants
-from openmsl_qc_opendrive.base import models, utils
+from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_road_type_vs_speed_limit"
 CHECKER_DESCRIPTION = "Speed Limit of Lanes should match with road type"
-CHECKER_PRECONDITIONS = ""#basic_preconditions.CHECKER_PRECONDITIONS
+CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:road.road_type_vs_speed_limit"
 
 def getSpeedRange(roadType: str) -> None:
@@ -91,7 +91,7 @@ def registerIssue(checker_data: models.CheckerData, description : str, treeEleme
     )
 
 def _check_all_roads(checker_data: models.CheckerData) -> None:
-    roads = utils.get_roads(checker_data.input_file_xml_root)
+    roads = get_roads(checker_data.input_file_xml_root)
 
     for road in roads:
         if road.find("type") is None:
@@ -103,20 +103,20 @@ def _check_all_roads(checker_data: models.CheckerData) -> None:
         if speedRange is None:
             registerIssue(checker_data, f"road {roadID} has invalid road type {roadType} or it is missing in config file", road, None)
         else:
-            laneSections = utils.get_lane_sections(road)
+            laneSections = get_lane_sections(road)
             for laneSection in laneSections:
-                s_coordinate = utils.get_s_from_lane_section(laneSection)
-                lanes = utils.get_left_and_right_lanes_from_lane_section(laneSection)
+                s_coordinate = get_s_from_lane_section(laneSection)
+                lanes = get_left_and_right_lanes_from_lane_section(laneSection)
                 for lane in lanes:
                     laneID = lane.attrib["id"]
                     laneType = lane.attrib['type']
-                    if laneType != 'driving':                                           # TODO mehr Lanetypen
+                    if laneType != 'driving':                                           # TODO accept more lanetypes
                         continue                        # only check driving lanes
 
                     for speed in lane.findall("./speed"):
                         speedvalue = get_speed_value(speed)            
                         if speedRange[0] > speedvalue or speedRange[1] < speedvalue:
-                            inertial_point = utils.get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection, lane, s_coordinate)
+                            inertial_point = get_middle_point_xyz_at_height_zero_from_lane_by_s(road, laneSection, lane, s_coordinate)
                             registerIssue(checker_data, 
                                         f"road {roadID} laneSection {s_coordinate} lane {laneID} has speed value {speedvalue}km/h that is outside the valid range ({speedRange[0]} - {speedRange[1]})",
                                         lane, inertial_point)

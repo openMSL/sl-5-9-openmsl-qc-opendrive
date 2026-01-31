@@ -1,14 +1,14 @@
 [tool.poetry]
 name = "openmsl-qc-opendrive"
 version = "0.0.1"
-description = "This project implements the OpenDrive Checker for OpenMSL."
+description = "This project implements the ASAM OpenDRIVE Checker for OpenMSL."
 authors = ["Mirco Nierenz <mirco.nierenz@triangraphics.de>", "Michael Hoehndorf <michael.hoehendorf@triangraphics.de>"]
 license = "MPL-2.0"
 readme = "README.md"
 packages = [
     { include = "openmsl_qc_opendrive" },
 ]
-
+homepage = "https://github.com/GAIA-X4PLC-AAD/OpenValidator/tree/openmsl_qc-opendrive"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -19,6 +19,7 @@ scipy = "^1.14.0"
 pyclothoids = "^0.1.5"
 transforms3d = "^0.4.2"
 xmlschema = "^3.3.1"
+semver = "^3.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
