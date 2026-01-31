@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "openmsl-qc-opendrive"
 version = "0.0.1"
-description = "This project implements the OpenDrive Checker for OpenMSL."
+description = "This project implements the ASAM OpenDRIVE Checker for OpenMSL."
 authors = ["Mirco Nierenz <mirco.nierenz@triangraphics.de>", "Michael Hoehndorf <michael.hoehendorf@triangraphics.de>"]
 license = "MPL-2.0"
 readme = "README.md"
