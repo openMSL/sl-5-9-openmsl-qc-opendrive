@@ -1,5 +1,6 @@
 # openmsl-qc-opendrive
 
+This project extends the ASAM QualityChecker (https://www.asam.net/standards/asam-quality-checker/) with simulation-based checks for ASAM OpenDRIVE (https://www.asam.net/standards/detail/opendrive/).
 This project implements the [OpenMSL OpenDrive Checker Bundle](checker_bundle_doc.md).
 
 ## Installation and usage
