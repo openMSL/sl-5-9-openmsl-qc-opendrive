@@ -31,7 +31,7 @@ This also explains how to use the manifest, the configuration file, and how to r
 
 ## Usage
 
-```bash
+```
 openmsl_qc_opendrive -c config_file.xml
 ```
 
