@@ -1,7 +1,7 @@
 # Checker bundle: openmsl_xodr_simulation_bundle
 
 * Build version:  v1.0.0
-* Description:    OpenDrive simulation checker bundle
+* Description:    OpenDRIVE simulation checker bundle
 
 ## Parameters
 
@@ -100,7 +100,7 @@
 
 ### check_openmsl_xodr_statistic
 
-* Description: Prints some infos about OpenDrive file.
+* Description: Prints some infos about OpenDRIVE file.
 
 ### check_openmsl_xodr_road_type_vs_speed_limit
 

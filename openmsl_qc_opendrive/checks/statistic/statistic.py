@@ -6,7 +6,7 @@ from openmsl_qc_opendrive import constants
 from qc_opendrive.base.utils import *
 
 CHECKER_ID = "check_openmsl_xodr_statistic"
-CHECKER_DESCRIPTION = "Prints some infos about OpenDrive file"
+CHECKER_DESCRIPTION = "Prints some infos about OpenDRIVE file"
 CHECKER_PRECONDITIONS = set()
 RULE_UID = "openmsl.net:xodr:1.4.0:statistic"
 
@@ -79,7 +79,7 @@ def check_rule(checker_data: models.CheckerData) -> None:
     """
     Rule ID: openmsl.net:xodr:1.4.0:statistic
 
-    Description: Prints some infos about OpenDrive file.
+    Description: Prints some infos about OpenDRIVE file.
 
     Severity: INFORMATION
 

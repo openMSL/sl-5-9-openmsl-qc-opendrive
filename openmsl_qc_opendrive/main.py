@@ -29,8 +29,8 @@ logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 def args_entrypoint() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="OpenMSL QC OpenDrive Checker",
-        description="This is a collection of scripts for checking the validity for simulation tools of OpenDrive (.xodr) files.",
+        prog="OpenMSL QC OpenDRIVE Checker",
+        description="This is a collection of scripts for checking the validity for simulation tools of OpenDRIVE (.xodr) files.",
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
@@ -266,7 +266,7 @@ def main():
     result = Result()
     result.register_checker_bundle(
         name=constants.BUNDLE_NAME,
-        description="OpenMSL OpenDrive checker bundle",
+        description="OpenMSL OpenDRIVE checker bundle",
         version=constants.BUNDLE_VERSION,
         summary="",
     )
