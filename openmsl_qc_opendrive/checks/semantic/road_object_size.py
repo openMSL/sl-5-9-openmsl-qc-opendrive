@@ -8,6 +8,7 @@ import logging
 
 from lxml import etree
 from qc_baselib import IssueSeverity
+from semver.version import Version
 
 from openmsl_qc_opendrive import constants
 from qc_opendrive.base.utils import *
@@ -22,18 +23,23 @@ MAX_OBJECT_WIDTH = 50
 MAX_OBJECT_RADIUS = 50
 MAX_OBJECT_HEIGHT = 50
 
+# OpenDRIVE 1.6 made height/width/length optional for objects with <outline>.
+# In earlier versions (1.4, 1.5) these attributes are mandatory on every object.
+_VERSION_OUTLINE_ATTRS_OPTIONAL = Version.parse("1.6.0")
+
 def check_object_size(road: etree.Element, object: etree.Element, checker_data: models.CheckerData) -> None:
     roadID = road.attrib["id"]
     objectID = object.attrib["id"]
     objectS = to_float(object.attrib["s"])
     objectT = to_float(object.attrib["t"])
 
-    # Objects whose geometry is defined by an <outline> element (e.g. polygonal
-    # objects) do not carry the height/length/width attributes on the <object>
-    # element — their dimensions are described by the outline corners instead.
-    # Skip the size check for these objects.
     has_outline = object.find("outlines/outline") is not None
-    if has_outline:
+    schema_version = Version.parse(checker_data.schema_version)
+
+    # From OpenDRIVE 1.6 onward, objects defined by an <outline> do not need
+    # height/length/width on the <object> element — skip the size check.
+    # In earlier versions these attributes are mandatory, so we still check.
+    if has_outline and schema_version >= _VERSION_OUTLINE_ATTRS_OPTIONAL:
         return
 
     # check if width + length or radius is present
@@ -57,7 +63,7 @@ def check_object_size(road: etree.Element, object: etree.Element, checker_data: 
         if objectWidth < 0.0 or objectWidth > MAX_OBJECT_WIDTH:
             issue_descriptions.append(f"object {objectID} of road {roadID} has invalid width {objectWidth} out of range (0-{MAX_OBJECT_WIDTH})")
 
-    # check height (optional attribute — use safe access)
+    # check height — use safe access to prevent KeyError on outlined objects
     objectHeightAttrib = object.attrib.get("height")
     if objectHeightAttrib is not None:
         objectHeight = to_float(objectHeightAttrib)
