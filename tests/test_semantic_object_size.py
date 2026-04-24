@@ -76,8 +76,10 @@ def test_road_object_size_outline_v1_5_reports_issues(monkeypatch) -> None:
 
     assert result.get_checker_status(checker_id) == StatusType.COMPLETED
     issues = result.get_issues_by_rule_uid(rule_uid)
-    # Outlined object in v1.5 without height/width/length → at least 1 issue
-    assert len(issues) >= 1
+    # Outlined object in v1.5 without height/width/length → exactly 2 issues
+    # (one for missing size, one for missing height)
+    assert len(issues) == 2
+    assert any("height" in issue.description.lower() for issue in issues)
 
     cleanup_files()
 
@@ -101,5 +103,30 @@ def test_road_object_size_outline_v1_7_no_issues(monkeypatch) -> None:
     assert result.get_checker_status(checker_id) == StatusType.COMPLETED
     issues = result.get_issues_by_rule_uid(rule_uid)
     assert len(issues) == 0
+
+    cleanup_files()
+
+
+def test_road_object_size_no_outline_no_height_v1_7_reports_issue(monkeypatch) -> None:
+    """In OpenDRIVE >= 1.6, non-outlined objects still need a height attribute.
+    The else branch should fire and report a missing-height issue."""
+    base_path = "tests/data/road_object_size/"
+    target_file_path = os.path.join(
+        base_path, "road_object_size_no_outline_no_height_v1_7.xodr"
+    )
+    rule_uid = semantic.road_object_size.RULE_UID
+    checker_id = semantic.road_object_size.CHECKER_ID
+
+    create_test_config(target_file_path)
+    launch_main(monkeypatch)
+
+    result = Result()
+    result.load_from_file(REPORT_FILE_PATH)
+
+    assert result.get_checker_status(checker_id) == StatusType.COMPLETED
+    issues = result.get_issues_by_rule_uid(rule_uid)
+    # Non-outlined object in v1.7 without height → 1 issue for missing height
+    assert len(issues) == 1
+    assert "height" in issues[0].description.lower()
 
     cleanup_files()

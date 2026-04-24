@@ -63,12 +63,17 @@ def check_object_size(road: etree.Element, object: etree.Element, checker_data: 
         if objectWidth < 0.0 or objectWidth > MAX_OBJECT_WIDTH:
             issue_descriptions.append(f"object {objectID} of road {roadID} has invalid width {objectWidth} out of range (0-{MAX_OBJECT_WIDTH})")
 
-    # check height — use safe access to prevent KeyError on outlined objects
+    # check height — use safe access to prevent KeyError on outlined objects.
+    # The else branch reports missing height as an issue.  Outlined objects on
+    # OpenDRIVE >= 1.6 already early-return above, so the else only fires for
+    # objects that are expected to carry a height attribute.
     objectHeightAttrib = object.attrib.get("height")
     if objectHeightAttrib is not None:
         objectHeight = to_float(objectHeightAttrib)
         if objectHeight > MAX_OBJECT_HEIGHT:
             issue_descriptions.append(f"object {objectID} of road {roadID} has too high height value {objectHeight} (max = {MAX_OBJECT_HEIGHT})")
+    else:
+        issue_descriptions.append(f"object {objectID} of road {roadID} has no defined height. Height must be provided")
 
     for description in issue_descriptions:
         # register issues
