@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<OpenDRIVE>
+	<header revMajor="1" revMinor="5" name="outline_test_v1_5" version="1.00" date="2026-04-22" north="250" south="-250" east="250" west="-250" vendor="test">
+	</header>
+	<road name="unnamed" length="100" id="2" junction="-1">
+		<type s="0" type="rural" />
+		<planView>
+			<geometry s="0" x="0" y="0" hdg="0" length="100">
+				<line />
+			</geometry>
+		</planView>
+		<elevationProfile>
+			<elevation s="0" a="0" b="0" c="0" d="0" />
+		</elevationProfile>
+		<lateralProfile />
+		<lanes>
+			<laneSection s="0">
+				<center>
+					<lane id="0" type="driving">
+					</lane>
+				</center>
+				<right>
+					<lane id="-1" type="driving">
+						<width sOffset="0" a="3" b="0.0" c="0" d="0" />
+					</lane>
+				</right>
+			</laneSection>
+		</lanes>
+		<objects>
+			<object type="obstacle" id="0" s="10" t="0" zOffset="0" orientation="none">
+				<outlines>
+					<outline id="0" closed="true">
+						<cornerLocal u="-0.5" v="1.0" z="0" height="5" id="1"/>
+						<cornerLocal u="0.5" v="1.0" z="0" height="5" id="2"/>
+						<cornerLocal u="0.5" v="-1.0" z="0" height="5" id="3"/>
+						<cornerLocal u="-0.5" v="-1.0" z="0" height="5" id="4"/>
+					</outline>
+				</outlines>
+			</object>
+		</objects>
+	</road>
+</OpenDRIVE>

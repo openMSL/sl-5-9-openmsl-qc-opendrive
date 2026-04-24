@@ -8,6 +8,7 @@ import logging
 
 from lxml import etree
 from qc_baselib import IssueSeverity
+from semver.version import Version
 
 from openmsl_qc_opendrive import constants
 from qc_opendrive.base.utils import *
@@ -22,11 +23,24 @@ MAX_OBJECT_WIDTH = 50
 MAX_OBJECT_RADIUS = 50
 MAX_OBJECT_HEIGHT = 50
 
+# OpenDRIVE 1.6 made height/width/length optional for objects with <outline>.
+# In earlier versions (1.4, 1.5) these attributes are mandatory on every object.
+_VERSION_OUTLINE_ATTRS_OPTIONAL = Version.parse("1.6.0")
+
 def check_object_size(road: etree.Element, object: etree.Element, checker_data: models.CheckerData) -> None:
     roadID = road.attrib["id"]
     objectID = object.attrib["id"]
     objectS = to_float(object.attrib["s"])
     objectT = to_float(object.attrib["t"])
+
+    has_outline = object.find("outlines/outline") is not None
+    schema_version = Version.parse(checker_data.schema_version)
+
+    # From OpenDRIVE 1.6 onward, objects defined by an <outline> do not need
+    # height/length/width on the <object> element — skip the size check.
+    # In earlier versions these attributes are mandatory, so we still check.
+    if has_outline and schema_version >= _VERSION_OUTLINE_ATTRS_OPTIONAL:
+        return
 
     # check if width + length or radius is present
     issue_descriptions = []
@@ -36,10 +50,10 @@ def check_object_size(road: etree.Element, object: etree.Element, checker_data: 
     if not objectLengthAttrib and not objectWidthAttrib and not objectRadiusAttrib:
         issue_descriptions.append(f"object {objectID} of road {roadID} has no defined size. Length and width or radius must be provided")
     elif objectRadiusAttrib and (objectLengthAttrib or objectWidthAttrib):
-        return # checked by schema
+        return  # checked by schema
     elif objectRadiusAttrib:
         objectRadius = to_float(object.attrib["radius"])
-        if objectRadius < 0.0 or objectRadius > MAX_OBJECT_RADIUS:          # TODO 3x < 0.0 check-> should be done by schema checks already, but is not done in 1.5 (and onyl in 2 cases in 1.7)
+        if objectRadius < 0.0 or objectRadius > MAX_OBJECT_RADIUS:  # TODO 3x < 0.0 check-> should be done by schema checks already, but is not done in 1.5 (and onyl in 2 cases in 1.7)
             issue_descriptions.append(f"object {objectID} of road {roadID} has invalid radius {objectRadius} out of range (0-{MAX_OBJECT_RADIUS})")
     else:
         objectLength = to_float(object.attrib["length"])
@@ -49,10 +63,17 @@ def check_object_size(road: etree.Element, object: etree.Element, checker_data: 
         if objectWidth < 0.0 or objectWidth > MAX_OBJECT_WIDTH:
             issue_descriptions.append(f"object {objectID} of road {roadID} has invalid width {objectWidth} out of range (0-{MAX_OBJECT_WIDTH})")
 
-    # check height
-    objectHeight = to_float(object.attrib["height"])     
-    if objectHeight > MAX_OBJECT_HEIGHT:
-        issue_descriptions.append(f"object {objectID} of road {roadID} has too high height value {objectHeight} (max = {MAX_OBJECT_HEIGHT})")
+    # check height — use safe access to prevent KeyError on outlined objects.
+    # The else branch reports missing height as an issue.  Outlined objects on
+    # OpenDRIVE >= 1.6 already early-return above, so the else only fires for
+    # objects that are expected to carry a height attribute.
+    objectHeightAttrib = object.attrib.get("height")
+    if objectHeightAttrib is not None:
+        objectHeight = to_float(objectHeightAttrib)
+        if objectHeight > MAX_OBJECT_HEIGHT:
+            issue_descriptions.append(f"object {objectID} of road {roadID} has too high height value {objectHeight} (max = {MAX_OBJECT_HEIGHT})")
+    else:
+        issue_descriptions.append(f"object {objectID} of road {roadID} has no defined height. Height must be provided")
 
     for description in issue_descriptions:
         # register issues
